@@ -2,6 +2,7 @@ const express = require('express');
 const minionsRouter = express.Router();
 const {getAllFromDatabase, addToDatabase, getFromDatabaseById, updateInstanceInDatabase, deleteFromDatabasebyId} = require('./db');
 const errorhandler = require('errorhandler');
+const workRouter = require('./work');
 
 minionsRouter.param('minionId', (req, res, next, minionId) => {
     const minion = getFromDatabaseById('minions', minionId);
@@ -48,6 +49,8 @@ minionsRouter.delete('/:minionId', (req, res, next) => {
         next(new Error('Minion could not be deleted'));
     }
 });
+
+minionsRouter.use('/:minionId/work', workRouter);
 
 minionsRouter.use(errorhandler());
 
