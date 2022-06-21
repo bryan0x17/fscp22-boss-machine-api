@@ -33,7 +33,6 @@ minionsRouter.get('/:minionId', (req, res, next) => {
 
 minionsRouter.put('/:minionId', (req, res, next) => {
     const updatedMinion = updateInstanceInDatabase('minions', req.body);
-    console.log(req.body);
     if (updatedMinion) {
         res.send(updatedMinion);
     } else {
@@ -48,7 +47,7 @@ minionsRouter.delete('/:minionId', (req, res, next) => {
     } else {
         next(new Error('Minion could not be deleted'));
     }
-})
+});
 
 minionsRouter.use(errorhandler());
 
