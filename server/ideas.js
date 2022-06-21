@@ -1,8 +1,8 @@
 const express = require('express');
 const ideasRouter = express.Router();
-const {getAllFromDatabase, addToDatabase, getFromDatabaseById, updateInstanceInDatabase, deleteFromDatabasebyId} = require('./db');
+const { getAllFromDatabase, addToDatabase, getFromDatabaseById, updateInstanceInDatabase, deleteFromDatabasebyId } = require('./db');
 const errorhandler = require('errorhandler');
-
+const checkMillionDollarIdea = require('./checkMillionDollarIdea');
 
 ideasRouter.param('ideaId', (req, res, next, ideasId) => {
     const idea = getFromDatabaseById('ideas', ideasId);
@@ -12,22 +12,23 @@ ideasRouter.param('ideaId', (req, res, next, ideasId) => {
     } else {
         next(new Error('Invalid idea ID'));
     }
-    
+
 });
 
 ideasRouter.get('/', (req, res, next) => {
     res.send(getAllFromDatabase('ideas'));
 });
 
-ideasRouter.post('/', (req, res, next) => {
-    const {name, description, numWeeks, weeklyRevenue} = req.body;
+ideasRouter.post('/', checkMillionDollarIdea, (req, res, next) => {
+    const { name, description, numWeeks, weeklyRevenue } = req.body;
     if (name && description && numWeeks && weeklyRevenue) {
-        res.status(201).send(addToDatabase('ideas', {
-            name, 
-            description, 
+        const idea = {
+            name,
+            description,
             numWeeks: Number(numWeeks),
             weeklyRevenue: Number(weeklyRevenue),
-        }));
+        };
+        res.status(201).send(addToDatabase('ideas', idea));
     } else {
         next(new Error('Invalid idea!'));
     }
@@ -37,13 +38,15 @@ ideasRouter.get('/:ideaId', (req, res, next) => {
     res.send(req.idea);
 });
 
-ideasRouter.put('/:ideaId', (req, res, next) => {
+ideasRouter.put('/:ideaId', checkMillionDollarIdea, (req, res, next) => {
     const updatedIdea = updateInstanceInDatabase('ideas', req.body);
     if (updatedIdea) {
         res.send(updatedIdea);
     } else {
         next(new Error('Invalid fields!'));
     }
+
+
 });
 
 
